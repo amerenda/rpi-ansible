@@ -1,0 +1,4 @@
+- name: delete pi user
+  user:
+    name: pi
+    state: absent

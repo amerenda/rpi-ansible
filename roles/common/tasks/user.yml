@@ -1,0 +1,22 @@
+- name: create user
+  user:
+    name: alex
+    groups: sudo
+    state: present
+
+- name: ensure ssh keys are on hosts
+  authorized_key:
+    user: alex
+    state: present
+    key: https://raw.githubusercontent.com/amerenda/dotfiles/master/ssh/id_rsa_amerenda_personal.pub
+
+- name: ensure sudo group to have passwordless sudo
+  lineinfile:
+    dest: /etc/sudoers
+    state: present
+    regexp: '^%sudo'
+    line: '%sudo ALL=(ALL) NOPASSWD: ALL'
+
+- name: check sudoers file
+  command: visudo -c
+  register: sudo_result

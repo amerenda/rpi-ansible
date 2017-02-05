@@ -1,0 +1,5 @@
+- hosts: 
+    - pi-hosts
+  become: yes
+  roles: 
+    - roles/cleanup

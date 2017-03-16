@@ -1,2 +1,5 @@
 ---
-- include: user.yml tags=ssh,user,users
+- include: user.yml 
+  tags: ['ssh', 'user', 'users']
+- include: rasbpi.yml 
+  tags: ['setup', 'rasbpi']

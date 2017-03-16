@@ -2,4 +2,4 @@
     - pi-hosts
   become: yes
   roles: 
-    - roles/common
+    - ../roles/common

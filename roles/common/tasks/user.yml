@@ -8,7 +8,7 @@
   authorized_key:
     user: alex
     state: present
-    key: https://raw.githubusercontent.com/amerenda/dotfiles/master/ssh/id_rsa_amerenda_personal.pub
+    key: "{{ lookup('file', '/Users/alex/.ssh/id_rsa_amerenda_personal.pub') }}" 
 
 - name: ensure sudo group to have passwordless sudo
   lineinfile:
@@ -16,6 +16,7 @@
     state: present
     regexp: '^%sudo'
     line: '%sudo ALL=(ALL) NOPASSWD: ALL'
+    backup: yes
 
 - name: check sudoers file
   command: visudo -c

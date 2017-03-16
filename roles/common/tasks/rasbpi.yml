@@ -1,0 +1,19 @@
+- name: update all packages
+  apt:
+    upgrade: dist
+    update_cache: yes
+    cache_valid_time: 3600
+
+- name: ensure common packages
+  apt:
+    name: "{{ item }}"
+    state: latest
+    update_cache: yes
+    cache_valid_time: 3600
+  with_items: "{{ rasbpi_common_packages }}"
+
+- name: setup /etc/hosts
+  template:
+    src: hosts.j2
+    dest: /etc/hosts
+    backup: yes

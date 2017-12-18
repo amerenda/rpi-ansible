@@ -1,5 +1,8 @@
-- hosts: 
+- hosts:
     - pi-hosts
   become: yes
-  roles: 
+  vars:
+    - ansible_ssh_user: pi
+    - ansible_ssh_pass: raspberry
+  roles:
     - ../roles/common

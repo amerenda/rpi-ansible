@@ -8,5 +8,4 @@ ff02::2         ip6-allrouters
 {{ hostvars[host]['ansible_host'] }}     {{ host }}
 {% endfor %}
 
-127.0.1.1       raspberrypi
-
+127.0.1.1       {{ inventory_hostname }}

@@ -1,2 +1,3 @@
 ---
-# vars file for common
+rasbpi_ssh_user: alex
+rasbpi_ssh_key: ~/.ssh/id_rsa_amerenda_personal.pub

@@ -12,6 +12,10 @@
     cache_valid_time: 3600
   with_items: "{{ rasbpi_common_packages }}"
 
+- name: ensure hostname
+  hostname:
+    name: "{{ inventory_hostname }}"
+
 - name: setup /etc/hosts
   template:
     src: hosts.j2

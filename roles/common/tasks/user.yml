@@ -1,14 +1,15 @@
 - name: create user
   user:
-    name: alex
+    name: "{{ rasbpi_ssh_user }}"
+    shell: /bin/bash
     groups: sudo
     state: present
 
 - name: ensure ssh keys are on hosts
   authorized_key:
-    user: alex
+    user: "{{ rasbpi_ssh_user }}"
     state: present
-    key: "{{ lookup('file', '/Users/alex/.ssh/id_rsa_amerenda_personal.pub') }}" 
+    key: "{{ lookup('file', rasbpi_ssh_key) }}"
 
 - name: ensure sudo group to have passwordless sudo
   lineinfile:

@@ -1,5 +1,9 @@
-- hosts: 
+- hosts:
     - pi-hosts
+  vars_files:
+    - ../roles/common/vars/main.yml
+  user: "{{ rasbpi_ssh_user }}"
   become: yes
-  roles: 
-    - roles/cleanup
+  gather_facts: false
+  roles:
+    - ../roles/cleanup

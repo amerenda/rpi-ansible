@@ -21,6 +21,7 @@ All of these need to be done before we can run the ansible playbook
   ```
 
    (Note in my case the device was /dev/mmcblk0p2 you can find your device name by using `fdisk -l`)
+
 3. mount the first partition to /mnt/sd/boot
    Use the same steps as above
 4. edit requirements/dhcpcd.conf

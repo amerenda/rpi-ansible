@@ -1,0 +1,15 @@
+- name: ensure duck dns dir
+  file:
+    path: /opt/duckdns
+    state: directory
+
+- name: ensure ddns script
+  copy:
+    src: duck.sh
+    dest: /opt/duckdns/
+
+- name: ensure cron
+  cron:
+    name: "update DNS"
+    minute: 5
+    job: "/opt/duckdns/duck.sh >/dev/null 2>&1"

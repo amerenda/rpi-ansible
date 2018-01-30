@@ -1,0 +1,6 @@
+---
+- import_tasks: user.yml
+  tags: ['setup', 'ssh', 'user', 'users']
+
+- import_tasks: rasbpi.yml
+  tags: ['setup', 'rasbpi']

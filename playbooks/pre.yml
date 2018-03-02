@@ -4,5 +4,7 @@
   vars:
     - ansible_ssh_user: pi
     - ansible_ssh_pass: raspberry
+  vars_files:
+    - ../roles/common/vars/main.yml
   roles:
     - ../roles/pre

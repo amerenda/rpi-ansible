@@ -2,4 +2,4 @@
 rasbpi_ssh_user: alex
 rasbpi_ssh_key: ~/.ssh/id_rsa_amerenda_personal.pub
 
-openvpn_server: rpi3-4
+openvpn_server: rpi3-3

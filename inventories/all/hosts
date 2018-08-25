@@ -1,5 +1,5 @@
 [pi-hosts]
-rpi3-1  ansible_host=192.168.86.201
-rpi3-2  ansible_host=192.168.86.202
-rpi3-3  ansible_host=192.168.86.203
-rpi3-4  ansible_host=192.168.86.204
+rpi3-0  ansible_host=10.100.20.200
+rpi3-1  ansible_host=10.100.20.201
+rpi3-2  ansible_host=10.100.20.202
+rpi3-3  ansible_host=10.100.20.203

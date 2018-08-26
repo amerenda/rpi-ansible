@@ -2,3 +2,4 @@
 # defaults file for common
 rasbpi_common_packages:
   - vim
+  - git

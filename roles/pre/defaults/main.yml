@@ -3,3 +3,6 @@
 rasbpi_common_packages:
   - vim
   - git
+  - lsof
+  - tcpdump
+  - netcat

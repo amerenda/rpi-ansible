@@ -1,0 +1,31 @@
+---
+- name: ensure docker is absnet
+  apt:
+    name: "{{ item }}"
+    state: absent
+    purge: True
+  with_items:
+    - docker-ce
+    - docker-ce-cli
+
+- name: install docker
+  shell: curl -sSL get.docker.com | sh
+  environment:
+    VERSION: "{{ docker_version }}"
+
+- name: ensure docker group
+  group:
+    name: docker
+    state: present
+
+- name: add alex user to docker
+  user:
+    name: alex
+    group: docker
+    append: True
+
+- name: hold docker from updating
+  command: "apt-mark hold {{ item }}"
+  with_items:
+    - docker-ce
+    - docker-ce-cli

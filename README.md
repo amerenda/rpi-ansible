@@ -17,10 +17,10 @@ All of these need to be done before we can run the ansible playbook
    (See the "latest Raspbian image" link above for more info)
 2. mount the second partition of the newly created Raspbian image
   ```
-  mount /dev/mmcblk0p2 /mnt/sd/
+  mount /dev/disk2s2 /mnt/sd/
   ```
 
-   (Note in my case the device was /dev/mmcblk0p2 you can find your device name by using `fdisk -l`)
+   (Note in my case the device was /dev/disk2s2 you can find your device name by using `fdisk -l`)
 
 3. mount the first partition to /mnt/sd/boot
    Use the same steps as above

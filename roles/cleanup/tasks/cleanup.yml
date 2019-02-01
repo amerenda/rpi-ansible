@@ -8,6 +8,7 @@
 - name: reboot server
   command: /sbin/shutdown -r +1 "Ansible gets rid of pi"
   delegate_to: "{{ inventory_hostname }}"
+  tags: ['reboot']
 
 - name: waiting for sever to come back
   wait_for:
@@ -16,6 +17,7 @@
     search_regex: OpenSSH
     delay: 65
   connection: local
+  tags: ['reboot']
 
 - name: delete pi user
   user:

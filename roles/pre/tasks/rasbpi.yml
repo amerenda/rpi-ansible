@@ -12,11 +12,22 @@
     update_cache: yes
     cache_valid_time: 3600
 
-- name: apt | update and upgrade packages
+- name: apt | upgrade packages
   apt:
-    upgrade: dist
+    upgrade: yes
     update_cache: yes
     cache_valid_time: 3600
+    allow_unauthenticated: yes
+    force_apt_get: yes
+  tags: ['apt-upgrade', 'upgrade']
+
+- name: apt | remove useless packages from the cache
+  apt:
+    autoclean: yes
+
+- name: apt | remove dependencies that are no longer required
+  apt:
+    autoremove: yes
 
 - name: ensure hostname
   hostname:

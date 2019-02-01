@@ -1,2 +1,5 @@
 [pi-hosts]
-localhost
+localhost   ansible_host=localhost
+
+[pi-hosts:vars]
+openvpn_server=localhost

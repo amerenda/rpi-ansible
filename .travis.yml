@@ -15,6 +15,10 @@ before_install:
   - sudo apt-get update -qq
   - sudo apt-get install python-apt
   - sudo useradd pi --password raspberry
+  - docker --version
+  - sudo mkdir -p /etc/systemd/system/getty.target.wants
+  - touch ~/getty-test-service
+  - sudo ln -s ~/getty-test-service /etc/systemd/system/getty.target.wants/getty@tty1.service
 
 install:
   # Install Ansible.
@@ -26,7 +30,7 @@ script:
   - ansible-playbook -i tests/inventory tests/test.yml --syntax-check
 
   # Run all ansible roles
-  - ansible-playbook -i tests/inventory tests/test.yml
+  - ansible-playbook -i tests/inventory tests/test.yml --skip-tags "upgrade, reboot, swap"
 
   # Check if alex user is created
   - id -u alex | grep -q "no" && (echo "user not found" && exit 1) || (echo "user alex found" && exit 0)
@@ -37,8 +41,8 @@ script:
   # check if alex has sudo
   - sudo su - alex -c "sudo ls" && (echo "user alex has sudo" && exit 0) || (echo "user alex cannot sudo" && exit 1)
 
-  # check if docker is running
-  - docker ps > /dev/null && (echo "docker is running" && exit 0) || (echo "docker is not running" && exit 1)
+  # check if docker is the correct version
+  - docker --version | grep -q "18.06" && (echo "docker is running 18.06" && exit 0) || (echo "docker is not running 18.06" && exit 1)
 
   # check if kubectl is installed
   - kubectl > /dev/null && (echo "kubectl is installed" && exit 0) || (echo "kubectl is not installed or in the path" && exit 1)

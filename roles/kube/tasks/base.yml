@@ -1,0 +1,51 @@
+---
+- name: disable swap
+  command: "{{ item }}"
+  with_items:
+    - dphys-swapfile swapoff
+    - dphys-swapfile uninstall
+    - update-rc.d dphys-swapfile remove
+
+- name: check for cgroups
+  command: "grep 'cgroup_enable=cpuset' /boot/cmdline.txt"
+  register: _grep_result
+  ignore_errors: True
+
+- name: add cgroups
+  shell: echo $( cat /boot/cmdline.txt ) "cgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory" >  /boot/cmdline.txt
+  when: _grep_result.rc != 0
+
+- name: reboot pis
+  command: /sbin/shutdown -r +1 "Ansible adds cgroups"
+  delegate_to: "{{ inventory_hostname }}"
+
+- name: waiting for sever to come back
+  wait_for:
+    port: 22
+    host: "{{ ansible_host }}"
+    search_regex: OpenSSH
+    delay: 65
+  connection: local
+
+- name: add kube apt key
+  apt_key:
+    url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+    state: present
+
+- name: add kube repo
+  apt_repository:
+    repo: deb http://apt.kubernetes.io/ kubernetes-xenial main
+    state: present
+
+- name: update packages
+  apt:
+    update_cache: yes
+    upgrade: dist
+
+- name: install kubeadm
+  apt:
+    name: kubeadm
+    state: present
+
+- name: pull config images
+  command: kubeadm config images pull

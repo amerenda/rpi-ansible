@@ -5,11 +5,18 @@
     groups: sudo
     state: present
 
-- name: ensure ssh keys are on hosts
+- name: ensure keys are on host
   authorized_key:
     user: "{{ rasbpi_ssh_user }}"
     state: present
+    exclusive: True
     key: "{{ lookup('file', rasbpi_ssh_key) }}"
+
+- name: ensure ssh folder ownership
+  file:
+    path: "/home/{{ rasbpi_ssh_user }}/.ssh"
+    owner: "{{ rasbpi_ssh_user }}"
+    group: "{{ rasbpi_ssh_user }}"
 
 - name: ensure sudo group to have passwordless sudo
   lineinfile:

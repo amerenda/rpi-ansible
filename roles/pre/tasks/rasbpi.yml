@@ -1,5 +1,10 @@
 - name: update all packages
   apt:
+    name: "*"
+    state: latest
+
+- name: dist upgrade
+  apt:
     upgrade: dist
     update_cache: yes
     cache_valid_time: 3600
@@ -21,3 +26,8 @@
     src: hosts.j2
     dest: /etc/hosts
     backup: yes
+
+- name: disable leds
+  command: "{{ item }}"
+  with_items:
+    - echo none > /sys/class/leds/led0/trigger

@@ -7,19 +7,13 @@ python: "2.7"
 # Doc: https://docs.travis-ci.com/user/customizing-the-build#Build-Matrix
 env:
   - ANSIBLE_VERSION=latest
-  - ANSIBLE_VERSION=2.7.0
-  - ANSIBLE_VERSION=2.6.5
-  - ANSIBLE_VERSION=2.5.9
-  - ANSIBLE_VERSION=2.4.6
-  - ANSIBLE_VERSION=2.3.3
-  - ANSIBLE_VERSION=2.2.3
-  - ANSIBLE_VERSION=2.1.6
 branches:
   only:
     - master
 
 before_install:
   - sudo apt-get update -qq
+  - sudo apt-get install python-apt
   - sudo useradd pi --password raspberry
 
 install:

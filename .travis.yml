@@ -1,0 +1,51 @@
+---
+dist: trusty
+
+language: python
+python: "2.7"
+
+# Doc: https://docs.travis-ci.com/user/customizing-the-build#Build-Matrix
+env:
+  - ANSIBLE_VERSION=latest
+  - ANSIBLE_VERSION=2.7.0
+  - ANSIBLE_VERSION=2.6.5
+  - ANSIBLE_VERSION=2.5.9
+  - ANSIBLE_VERSION=2.4.6
+  - ANSIBLE_VERSION=2.3.3
+  - ANSIBLE_VERSION=2.2.3
+  - ANSIBLE_VERSION=2.1.6
+branches:
+  only:
+    - master
+
+before_install:
+  - sudo apt-get update -qq
+  - sudo useradd pi --password raspberry
+
+install:
+  # Install Ansible.
+  - if [ "$ANSIBLE_VERSION" = "latest" ]; then pip install ansible; else pip install ansible==$ANSIBLE_VERSION; fi
+  - if [ "$ANSIBLE_VERSION" = "latest" ]; then pip install ansible-lint; fi
+
+script:
+  # Check the role/playbook's syntax.
+  - ansible-playbook -i tests/inventory tests/test.yml --syntax-check
+
+  # Run all ansible roles
+  - ansible-playbook -i tests/inventory tests/test.yml
+
+  # Check if alex user is created
+  - id -u alex | grep -q "no" && (echo "user not found" && exit 1) || (echo "user alex found" && exit 0)
+
+  # check if pi user is deleted
+  - id -u pi | grep -q "no" && (echo "user not found" && exit 0) || (echo "user pi found" && exit 1)
+
+  # check if alex has sudo
+  - sudo su - alex -c "sudo ls" && (echo "user alex has sudo" && exit 0) || (echo "user alex cannot sudo" && exit 1)
+
+  # check if docker is running
+  - docker ps > /dev/null && (echo "docker is running" && exit 0) || (echo "docker is not running" && exit 1)
+
+  # check if kubectl is installed
+  - kubectl > /dev/null && (echo "kubectl is installed" && exit 0) || (echo "kubectl is not installed or in the path" && exit 1)
+

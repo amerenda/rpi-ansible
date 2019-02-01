@@ -1,0 +1,9 @@
+---
+- hosts: localhost
+  connection: local
+  become: true
+  roles:
+    - {role: ../roles/pre}
+    - {role: ../roles/common}
+    - {role: ../roles/cleanup}
+    - {role: ../roles/kube}

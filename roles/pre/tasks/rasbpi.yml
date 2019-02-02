@@ -32,12 +32,14 @@
 - name: ensure hostname
   hostname:
     name: "{{ inventory_hostname }}"
+  tags: ['hostname']
 
 - name: setup /etc/hosts
   template:
     src: hosts.j2
     dest: /etc/hosts
     backup: yes
+  tags: ['hostname']
 
 - name: disable leds
   command: "{{ item }}"

@@ -1,5 +1,5 @@
 [pi-hosts]
-localhost   ansible_host=localhost
+localhost   ansible_host=localhost inventory_hostname=rpi-unit-test
 
 [pi-hosts:vars]
 openvpn_server=localhost

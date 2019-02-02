@@ -6,3 +6,5 @@ rasbpi_common_packages:
   - lsof
   - tcpdump
   - netcat
+  - cron
+  - apt-transport-https

@@ -9,8 +9,17 @@
   authorized_key:
     user: "{{ rasbpi_ssh_user }}"
     state: present
-    exclusive: True
-    key: "{{ lookup('file', rasbpi_ssh_key) }}"
+    exclusive: true
+    key: "{{ lookup('file', rasbpi_ssh_key_file) }}"
+  when: rasbpi_ssh_key_file is defined
+
+- name: ensure keys are on host
+  authorized_key:
+    user: "{{ rasbpi_ssh_user }}"
+    state: present
+    exclusive: true
+    key: "{{ rasbpi_ssh_key_url }}"
+  when: rasbpi_ssh_key_url is defined
 
 - name: ensure ssh folder ownership
   file:

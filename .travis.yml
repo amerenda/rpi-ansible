@@ -1,51 +1,26 @@
 ---
 dist: trusty
 
-language: python
-python: "2.7"
-
-# Doc: https://docs.travis-ci.com/user/customizing-the-build#Build-Matrix
-env:
-  - ANSIBLE_VERSION=latest
-  - ANSIBLE_VERSION=2.7.0
-  - ANSIBLE_VERSION=2.6.5
-  - ANSIBLE_VERSION=2.5.9
-  - ANSIBLE_VERSION=2.4.6
-  - ANSIBLE_VERSION=2.3.3
-  - ANSIBLE_VERSION=2.2.3
-  - ANSIBLE_VERSION=2.1.6
 branches:
   only:
     - master
 
-before_install:
-  - sudo apt-get update -qq
-  - sudo useradd pi --password raspberry
+env:
+  - distribution: rpi-raspbian
+    version: stretch
 
-install:
-  # Install Ansible.
-  - if [ "$ANSIBLE_VERSION" = "latest" ]; then pip install ansible; else pip install ansible==$ANSIBLE_VERSION; fi
-  - if [ "$ANSIBLE_VERSION" = "latest" ]; then pip install ansible-lint; fi
+before_install:
+  - sudo apt-get --yes --no-install-recommends install binfmt-support qemu-user-static
+  - echo ':arm:M::\x7fELF\x01\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x28\x00:\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff:/usr/bin/qemu-arm-static:' | sudo tee -a /proc/sys/fs/binfmt_misc/register
+  - 'sudo docker pull balenalib/${distribution}:${version}'
+  - 'sudo docker build --no-cache --rm --file=.travis/Dockerfile.${distribution}-${version} --tag=${distribution}-${version}:ansible .travis'
 
 script:
-  # Check the role/playbook's syntax.
-  - ansible-playbook -i tests/inventory tests/test.yml --syntax-check
-
-  # Run all ansible roles
-  - ansible-playbook -i tests/inventory tests/test.yml
-
-  # Check if alex user is created
-  - id -u alex | grep -q "no" && (echo "user not found" && exit 1) || (echo "user alex found" && exit 0)
-
-  # check if pi user is deleted
-  - id -u pi | grep -q "no" && (echo "user not found" && exit 0) || (echo "user pi found" && exit 1)
-
-  # check if alex has sudo
-  - sudo su - alex -c "sudo ls" && (echo "user alex has sudo" && exit 0) || (echo "user alex cannot sudo" && exit 1)
-
-  # check if docker is running
-  - docker ps > /dev/null && (echo "docker is running" && exit 0) || (echo "docker is not running" && exit 1)
-
-  # check if kubectl is installed
-  - kubectl > /dev/null && (echo "kubectl is installed" && exit 0) || (echo "kubectl is not installed or in the path" && exit 1)
-
+  - 'container_id=$(mktemp)'
+  - 'sudo docker run --hostname rpi-test-build --detach --privileged -v /sys/fs/cgroup:/sys/fs/cgroup:ro --volume="${PWD}":/etc/ansible:ro ${distribution}-${version}:ansible > "${container_id}"'
+  - 'sudo docker exec "$(cat ${container_id})" env ANSIBLE_FORCE_COLOR=1 ansible-playbook -v /etc/ansible/tests/test.yml --syntax-check'
+  - 'sudo docker exec "$(cat ${container_id})" env ANSIBLE_FORCE_COLOR=1 ansible-playbook -v /etc/ansible/tests/test.yml -i /etc/ansible/tests/inventory --skip-tags "reboot,hostname,swap,travis"'
+  - 'sudo docker exec "$(cat ${container_id})" id -u alex | grep -q "no" && (echo "user not found" && exit 1) || (echo "user alex found" && exit 0)'
+  - 'sudo docker exec "$(cat ${container_id})" id -u pi | grep -q "no" && (echo "pi user found" && exit 1) || (echo "pi user not found" && exit 0)'
+  - 'sudo docker exec "$(cat ${container_id})" /usr/bin/kubectl > /dev/null && (echo "kubectl is installed" && exit 0) || (echo "kubectl is not installed or in the path" && exit 1)'
+  - 'sudo docker rm -f "$(cat ${container_id})"'

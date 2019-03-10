@@ -1,0 +1,22 @@
+FROM balenalib/rpi-raspbian:stretch
+
+RUN apt-get update -y
+
+RUN apt-get install -y --no-install-recommends \
+    software-properties-common \
+    build-essential \
+    libffi-dev \
+    libssl-dev \
+    python-dev \
+    python-pip \
+    git \
+    dbus \
+    systemd
+
+RUN echo "deb http://ppa.launchpad.net/ansible/ansible/ubuntu trusty main" >> /etc/apt/sources.list
+RUN sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 93C4A3FD7BB9C367
+RUN sudo apt-get update
+RUN sudo apt-get install ansible
+RUN mkdir -p /etc/ansible
+
+ENTRYPOINT ["/bin/systemd"]

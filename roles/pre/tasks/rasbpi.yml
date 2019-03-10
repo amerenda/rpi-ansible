@@ -1,33 +1,48 @@
-- name: update all packages
-  apt:
-    name: "*"
-    state: latest
+- name: apt | update keys
+  command: apt-key update
 
-- name: dist upgrade
+- name: apt | apt-get update
   apt:
-    upgrade: dist
     update_cache: yes
-    cache_valid_time: 3600
 
-- name: ensure common packages
+- name: apt | ensure common packages
   apt:
-    name: "{{ item }}"
+    name: "{{ query('flattened','{{ rasbpi_common_packages }}') }}"
     state: latest
     update_cache: yes
     cache_valid_time: 3600
-  with_items: "{{ rasbpi_common_packages }}"
+
+- name: apt | upgrade packages
+  apt:
+    upgrade: yes
+    update_cache: yes
+    cache_valid_time: 3600
+    allow_unauthenticated: yes
+    force_apt_get: yes
+  tags: ['apt-upgrade', 'upgrade']
+
+- name: apt | remove useless packages from the cache
+  apt:
+    autoclean: yes
+
+- name: apt | remove dependencies that are no longer required
+  apt:
+    autoremove: yes
 
 - name: ensure hostname
   hostname:
     name: "{{ inventory_hostname }}"
+  tags: ['hostname']
 
 - name: setup /etc/hosts
   template:
     src: hosts.j2
     dest: /etc/hosts
     backup: yes
+  tags: ['hostname']
 
 - name: disable leds
   command: "{{ item }}"
   with_items:
     - echo none > /sys/class/leds/led0/trigger
+  ignore_errors: True

@@ -1,3 +1,4 @@
 ---
 rasbpi_ssh_user: alex
-rasbpi_ssh_key: ~/.ssh/id_rsa_alex_personal.pub
+rasbpi_ssh_key_url: https://raw.githubusercontent.com/amerenda/dotfiles/master/ssh/id_rsa_amerenda_personal.pub
+

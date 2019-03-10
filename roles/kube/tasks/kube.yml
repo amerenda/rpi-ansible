@@ -54,3 +54,4 @@
 - name: pull config images
   command: kubeadm config images pull
   tags: ['travis']
+

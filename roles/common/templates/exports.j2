@@ -1,0 +1,5 @@
+{% for name in nfs_drives %}
+{% for host in groups['pi-hosts'] %}
+{{ name.path }} {{ hostvars[host].ansible_host }}{{ nfs_exports_args }}
+{% endfor %}
+{% endfor %}

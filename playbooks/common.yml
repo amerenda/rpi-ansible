@@ -1,6 +1,8 @@
 - hosts:
     - pi-hosts
   become: yes
-  user: "{{ rasbpi_ssh_user }}"
+  vars_files:
+    - ../roles/common/vars/main.yml
+  user: "{{ rpi_ssh_user }}"
   roles:
     - ../roles/common

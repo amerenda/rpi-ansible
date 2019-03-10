@@ -1,31 +1,31 @@
 - name: create user
   user:
-    name: "{{ rasbpi_ssh_user }}"
+    name: "{{ rpi_ssh_user }}"
     shell: /bin/bash
     groups: sudo
     state: present
 
 - name: ensure keys are on host
   authorized_key:
-    user: "{{ rasbpi_ssh_user }}"
+    user: "{{ rpi_ssh_user }}"
     state: present
     exclusive: true
-    key: "{{ lookup('file', rasbpi_ssh_key_file) }}"
-  when: rasbpi_ssh_key_file is defined
+    key: "{{ lookup('file', rpi_ssh_key_file) }}"
+  when: rpi_ssh_key_file is defined
 
 - name: ensure keys are on host
   authorized_key:
-    user: "{{ rasbpi_ssh_user }}"
+    user: "{{ rpi_ssh_user }}"
     state: present
     exclusive: true
-    key: "{{ rasbpi_ssh_key_url }}"
-  when: rasbpi_ssh_key_url is defined
+    key: "{{ rpi_ssh_key_url }}"
+  when: rpi_ssh_key_url is defined
 
 - name: ensure ssh folder ownership
   file:
-    path: "/home/{{ rasbpi_ssh_user }}/.ssh"
-    owner: "{{ rasbpi_ssh_user }}"
-    group: "{{ rasbpi_ssh_user }}"
+    path: "/home/{{ rpi_ssh_user }}/.ssh"
+    owner: "{{ rpi_ssh_user }}"
+    group: "{{ rpi_ssh_user }}"
 
 - name: ensure sudo group to have passwordless sudo
   lineinfile:

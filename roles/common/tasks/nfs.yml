@@ -1,0 +1,45 @@
+---
+- name: create nfs dir structure
+  file:
+    path: "{{ item.path }}"
+    state: directory
+    owner: root
+    group: root
+  with_items:
+    - "{{ nfs_drives }}"
+
+- name: ensure xfs filesystem on disks
+  filesystem:
+    fstype: xfs
+    dev: "{{ item.src }}"
+    force: no
+  with_items:
+    - "{{ nfs_drives }}"
+
+- name: ensure ext disks are mounted
+  mount:
+    path: "{{ item.path }}"
+    src: "{{ item.src }}"
+    fstype: xfs
+    state: mounted
+  with_items:
+    - "{{ nfs_drives }}"
+
+- name: ensure nfs packages are installed
+  apt:
+    name: "{{ packages }}"
+    state: present
+    update_cache: yes
+  vars:
+    packages:
+    - nfs-common
+    - nfs-kernel-server
+    - rpcbind
+
+- name: ensure exportfs
+  template:
+    src: exports.j2
+    dest: /etc/exports
+  notify:
+    - reload nfs
+

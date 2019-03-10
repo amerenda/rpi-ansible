@@ -7,7 +7,7 @@
 
 - name: apt | ensure common packages
   apt:
-    name: "{{ query('flattened','{{ rasbpi_common_packages }}') }}"
+    name: "{{ query('flattened','{{ rpi_common_packages }}') }}"
     state: latest
     update_cache: yes
     cache_valid_time: 3600
@@ -41,8 +41,16 @@
     backup: yes
   tags: ['hostname']
 
-- name: disable leds
-  command: "{{ item }}"
-  with_items:
-    - echo none > /sys/class/leds/led0/trigger
-  ignore_errors: True
+- name: copy disable-led service file
+  copy:
+    src: disable-leds.service
+    dest: /etc/systemd/system/
+    owner: root
+    group: root
+
+- name: disable led service
+  systemd:
+    name: disable-leds
+    state: started
+    enabled: yes
+    daemon_reload: yes

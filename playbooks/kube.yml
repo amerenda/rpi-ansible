@@ -3,7 +3,7 @@
   vars_files:
     - ../roles/common/vars/main.yml
     - ../roles/kube/defaults/main.yml
-  user: "{{ rasbpi_ssh_user }}"
+  user: "{{ rpi_ssh_user }}"
   become: yes
   roles:
     - ../roles/kube

@@ -1,0 +1,13 @@
+[Unit]
+Description=Disables LEDs at startup
+
+[Service]
+Type=oneshot
+
+ExecStart=/bin/bash -c '/bin/echo 0 >/sys/class/leds/led0/brightness'
+ExecStart=/bin/bash -c '/bin/echo 0 >/sys/class/leds/led1/brightness'
+RemainAfterExit=True
+
+[Install]
+WantedBy=multi-user.target
+

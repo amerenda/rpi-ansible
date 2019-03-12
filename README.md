@@ -1,6 +1,8 @@
+[![Build Status](https://travis-ci.com/amerenda/ansible-rpi.svg?branch=master)](https://travis-ci.com/amerenda/ansible-rpi)
+
 # ansible-rpi
 This repository setups raspberry pi's headless with wifi
-
+k
 ## About
 This is an ansible repository used to setup raspberry pi's in a headless state. You should need a basic knowledge of ansible and linux/mac/\*nix to use this.
 

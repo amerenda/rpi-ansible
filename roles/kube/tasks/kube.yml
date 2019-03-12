@@ -5,6 +5,7 @@
     - dphys-swapfile swapoff
     - dphys-swapfile uninstall
     - update-rc.d dphys-swapfile remove
+  tags: ['swap']
 
 - name: check for cgroups
   command: "grep 'cgroup_enable=cpuset' /boot/cmdline.txt"
@@ -18,6 +19,7 @@
 - name: reboot pis
   command: /sbin/shutdown -r +1 "Ansible adds cgroups"
   delegate_to: "{{ inventory_hostname }}"
+  tags: ['reboot']
 
 - name: waiting for sever to come back
   wait_for:
@@ -26,6 +28,7 @@
     search_regex: OpenSSH
     delay: 65
   connection: local
+  tags: ['reboot']
 
 - name: add kube apt key
   apt_key:
@@ -39,8 +42,9 @@
 
 - name: update packages
   apt:
+    upgrade: yes
     update_cache: yes
-    upgrade: dist
+  tags: ['upgrade']
 
 - name: install kubeadm
   apt:
@@ -49,3 +53,5 @@
 
 - name: pull config images
   command: kubeadm config images pull
+  tags: ['travis']
+

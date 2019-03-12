@@ -1,8 +1,10 @@
 ---
 # defaults file for common
-rasbpi_common_packages:
+rpi_common_packages:
   - vim
   - git
   - lsof
   - tcpdump
   - netcat
+  - cron
+  - apt-transport-https

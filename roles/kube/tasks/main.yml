@@ -1,5 +1,5 @@
 ---
-- import_tasks: base.yml
-  tags: ['kube:install', 'install'] 
 - import_tasks: docker.yml
   tags: ['kube:install', 'install', 'kube:docker', 'docker']
+- import_tasks: kube.yml
+  tags: ['kube:install', 'install']

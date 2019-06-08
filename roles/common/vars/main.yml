@@ -6,7 +6,5 @@ nfs_host: rpi3-1
 nfs_drives:
   - path: /var/nfs/extssd1
     src: /dev/sda
-  - path: /var/nfs/exthdd1
-    src: /dev/sdb
 
 nfs_exports_args: "(rw,sync,no_root_squash)"

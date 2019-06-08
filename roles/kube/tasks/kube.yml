@@ -30,28 +30,3 @@
   connection: local
   tags: ['reboot']
 
-- name: add kube apt key
-  apt_key:
-    url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
-    state: present
-
-- name: add kube repo
-  apt_repository:
-    repo: deb http://apt.kubernetes.io/ kubernetes-xenial main
-    state: present
-
-- name: update packages
-  apt:
-    upgrade: yes
-    update_cache: yes
-  tags: ['upgrade']
-
-- name: install kubeadm
-  apt:
-    name: kubeadm
-    state: present
-
-- name: pull config images
-  command: kubeadm config images pull
-  tags: ['travis']
-

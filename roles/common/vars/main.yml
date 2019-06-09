@@ -8,3 +8,6 @@ nfs_drives:
     src: /dev/sda
 
 nfs_exports_args: "(rw,sync,no_root_squash)"
+
+#TODO use this ansible variable
+kubernetes_backend: k3s

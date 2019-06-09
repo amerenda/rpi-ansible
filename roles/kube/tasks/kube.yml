@@ -29,4 +29,3 @@
     delay: 65
   connection: local
   tags: ['reboot']
-

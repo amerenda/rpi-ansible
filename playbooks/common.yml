@@ -1,5 +1,5 @@
 - hosts:
-    - pi-hosts
+    - pi_hosts
   become: yes
   vars_files:
     - ../roles/common/vars/main.yml

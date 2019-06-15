@@ -1,34 +1,17 @@
 ---
 - name: bootstrap master
-  shell: curl https://k3s.io | sudo sh
+  shell: curl -sfL https://get.k3s.io | sh -
   async: 1000
-  poll: 10
+  poll: 0
   register: _k3s_master_bootstrap_bg
-  when: k3s_master == inventory_hostname
+  when: "'k3s_master' in group_names"
 
-- name: bootstrap workers
-  block:
-  - name: download k3s binary
-    get_url:
-      url: https://github.com/rancher/k3s/releases/download/v{{ k3s_version }}/k3s-armhf
-      dest: /usr/local/bin/
-      mode: '0755'
-
-  - name: download k3s systemd unit file
-    get_url:
-      url: https://raw.githubusercontent.com/rancher/k3s/master/k3s.service
-      dest: /etc/systemd/system/k3s.service
-
-  - name: reload systemd
-    systemd:
-      daemon-reload: yes
-
-  - name: enable k3s
-    systemd:
-      name: k3s.serivce
-      enabled: yes
-
-when: inventory_hostname in k3s_workers
+- name: download k3s binary
+  get_url:
+    url: https://github.com/rancher/k3s/releases/download/v{{ k3s_version }}/k3s-armhf
+    dest: /usr/local/bin/k3s
+    mode: '0755'
+  when: "'k3s_agents' in group_names"
 
 - name: wait for bootstrap master to finish (times out in 5 minutes)
   async_status: jid={{ _k3s_master_bootstrap_bg.ansible_job_id }}
@@ -36,23 +19,44 @@ when: inventory_hostname in k3s_workers
   until: _job_result.finished
   retries: 30
   delay: 10
+  ignore_errors: True
+  when: "'k3s_master' in group_names"
 
--name: set master join variables
+- name: get join token
+  command: cat /var/lib/rancher/k3s/server/node-token
+  register: _k3s_token
+  when: "'k3s_master' in group_names"
+
+- name: join agents
   block:
-  - name: get join token
-    command: cat /var/lib/rancher/k3s/server/node-token
-    register: _k3s_token
-
-  - name: set join token and master ip address facts
+  - name: set master node ip address and join token
     set_fact:
-      _k3s_master_ip_address: "{{ ansible_host }}"
-      _k3s_master_join_token: "{{ _k3s_token.stdout }}"
+      _k3s_master_ip_address: "{{ hostvars[groups['k3s_master'][0]]['ansible_default_ipv4']['address'] }}"
+      _k3s_master_join_token: "{{ hostvars[groups['k3s_master'][0]]['_k3s_token']['stdout'] }}"
+      _k3s_role: "agent"
 
-when: k3s_master == inventory_hostname
+  - name: upload k3s service file
+    template:
+      src: k3s.service.j2
+      dest: /etc/systemd/system/k3s-agent.service
+      owner: root
+      group: root
+      mode: 0600
 
-- name: join k3s agent(s) to master
-  shell: k3s agent --server ${K3S_URL} --token ${K3S_TOKEN}
-  environment:
-    K3S_URL: "https://{{ _k3s_master_ip_address: }}:6443"
-    K3S_TOKEN: "{{ _k3s_master_join_token }}"
-when: inventory_hostname in k3s_workers
+  - name: upload k3s service env file
+    template:
+      src: k3s-agent.service.env.j2
+      dest: /etc/systemd/system/k3s-agent.service.env
+
+
+  - name: reload systemd
+    systemd:
+      daemon_reload: yes
+
+  - name: join k3s agent(s) to master
+    systemd:
+      name: k3s-agent
+      state: restarted
+      enabled: yes
+
+  when: "'k3s_agents' in group_names"

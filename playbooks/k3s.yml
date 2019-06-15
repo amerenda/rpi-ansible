@@ -1,5 +1,5 @@
 - hosts:
-    - pi-hosts
+    - pi_hosts
   vars_files:
     - ../roles/common/vars/main.yml
     - ../roles/k3s/vars/main.yml

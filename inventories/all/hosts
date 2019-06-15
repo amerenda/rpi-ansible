@@ -1,5 +1,11 @@
-[pi-hosts]
+[k3s_master]
 rpi3-0  ansible_host=10.100.20.200
+
+[k3s_agents]
 rpi3-1  ansible_host=10.100.20.201
 rpi3-2  ansible_host=10.100.20.202
 rpi3-3  ansible_host=10.100.20.203
+
+[pi_hosts:children]
+k3s_master
+k3s_agents

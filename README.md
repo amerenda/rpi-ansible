@@ -1,5 +1,3 @@
-[![Build Status](https://travis-ci.com/amerenda/ansible-rpi.svg?branch=master)](https://travis-ci.com/amerenda/ansible-rpi)
-
 # ansible-rpi
 This repository setups raspberry pi's headless with wifi
 k

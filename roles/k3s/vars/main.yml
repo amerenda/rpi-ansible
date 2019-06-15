@@ -1,0 +1,7 @@
+k3s_version: 0.5.0
+k3s_master: rpi3-0
+k3s_workers:
+  - rpi3-1
+  - rpi3-2
+  - rpi3-3
+

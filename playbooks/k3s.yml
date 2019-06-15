@@ -1,0 +1,9 @@
+- hosts:
+    - pi-hosts
+  vars_files:
+    - ../roles/common/vars/main.yml
+    - ../roles/k3s/vars/main.yml
+  user: "{{ rpi_ssh_user }}"
+  become: yes
+  roles:
+    - ../roles/k3s

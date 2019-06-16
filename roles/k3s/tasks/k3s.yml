@@ -22,6 +22,12 @@
   ignore_errors: True
   when: "'k3s_master' in group_names"
 
+- name: remove traefik from master
+  file:
+    path: /var/lib/rancher/k3s/server/manifests/traefik.yml
+    state: absent
+  when: "'k3s_master' in group_names"
+
 - name: get join token
   command: cat /var/lib/rancher/k3s/server/node-token
   register: _k3s_token
@@ -47,7 +53,6 @@
     template:
       src: k3s-agent.service.env.j2
       dest: /etc/systemd/system/k3s-agent.service.env
-
 
   - name: reload systemd
     systemd:

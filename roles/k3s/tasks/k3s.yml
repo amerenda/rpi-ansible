@@ -16,7 +16,7 @@
 - name: wait for bootstrap master to finish (times out in 5 minutes)
   async_status: jid={{ _k3s_master_bootstrap_bg.ansible_job_id }}
   register: _job_result
-  until: _job_result.finished and _k3s_master_bootstrap_bg.rc == 0
+  until: _job_result.finished
   retries: 300
   delay: 1
   ignore_errors: True
@@ -72,17 +72,36 @@
     file:
       path: ~/.kube
       state: absent
+    become: false
 
   - name: ensure kube dir
     file:
       path: ~/.kube
       state: directory
+    become: false
 
   delegate_to: localhost
+  run_once: True
 
 - name: download kube config
   fetch:
     src: /etc/rancher/k3s/k3s.yaml
     dest: ~/.kube/config
     flat: yes
-  when: "k3s_master' in group_names"
+  when: "'k3s_master' in group_names"
+  run_once: True
+
+- name: get k3s master hostname
+  set_fact:
+    _k3s_master_ip_address: "{{ hostvars[groups['k3s_master'][0]]['ansible_default_ipv4']['address'] }}"
+  delegate_to: localhost
+  run_once: True
+
+- name: search and replace kube conifg
+  replace:
+    dest: ~/.kube/config
+    regexp: 'localhost'
+    replace: "{{ _k3s_master_ip_address }}"
+  delegate_to: localhost
+  become: false
+  run_once: True

@@ -16,9 +16,9 @@
 - name: wait for bootstrap master to finish (times out in 5 minutes)
   async_status: jid={{ _k3s_master_bootstrap_bg.ansible_job_id }}
   register: _job_result
-  until: _job_result.finished
-  retries: 30
-  delay: 10
+  until: _job_result.finished and _k3s_master_bootstrap_bg.rc == 0
+  retries: 300
+  delay: 1
   ignore_errors: True
   when: "'k3s_master' in group_names"
 
@@ -65,3 +65,24 @@
       enabled: yes
 
   when: "'k3s_agents' in group_names"
+
+- name: setup kube config
+  block:
+  - name: remove old kube dir
+    file:
+      path: ~/.kube
+      state: absent
+
+  - name: ensure kube dir
+    file:
+      path: ~/.kube
+      state: directory
+
+  delegate_to: localhost
+
+- name: download kube config
+  fetch:
+    src: /etc/rancher/k3s/k3s.yaml
+    dest: ~/.kube/config
+    flat: yes
+  when: "k3s_master' in group_names"

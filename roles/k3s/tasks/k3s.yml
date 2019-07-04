@@ -1,47 +1,74 @@
 ---
-- name: bootstrap master
+- name: master | bootstrap master
   shell: curl -sfL https://get.k3s.io | sh -
   async: 1000
   poll: 0
   register: _k3s_master_bootstrap_bg
   when: "'k3s_master' in group_names"
 
-- name: download k3s binary
+- name: agent | download k3s binary
   get_url:
     url: https://github.com/rancher/k3s/releases/download/v{{ k3s_version }}/k3s-armhf
     dest: /usr/local/bin/k3s
     mode: '0755'
   when: "'k3s_agents' in group_names"
 
-- name: wait for bootstrap master to finish (times out in 5 minutes)
-  async_status: jid={{ _k3s_master_bootstrap_bg.ansible_job_id }}
-  register: _job_result
-  until: _job_result.finished
-  retries: 300
-  delay: 1
-  ignore_errors: True
-  when: "'k3s_master' in group_names"
+- name: install master
+  block:
+  - name: master | set master facts
+    set_fact:
+      _k3s_role: 'master'
+      _k3s_systemd_options: "{{ k3s_master_systemd_options }}"
 
-- name: remove traefik from master
-  file:
-    path: /var/lib/rancher/k3s/server/manifests/traefik.yml
-    state: absent
-  when: "'k3s_master' in group_names"
+  - name: master | wait for bootstrap master to finish (times out in 5 minutes)
+    async_status: jid={{ _k3s_master_bootstrap_bg.ansible_job_id }}
+    register: _job_result
+    until: _job_result.finished
+    retries: 300
+    delay: 1
+    ignore_errors: True
 
-- name: get join token
-  command: cat /var/lib/rancher/k3s/server/node-token
-  register: _k3s_token
+  - name: master | upload systemd unit file
+    template:
+      src: k3s.service.j2
+      dest: /etc/systemd/system/k3s.service
+
+  - name: master | upload systemd env file
+    template:
+      src: "k3s.{{ _k3s_role }}.service.env.j2"
+      dest: /etc/systemd/system/k3s.service
+
+  - name: master | reload systemd
+    systemd:
+      daemon_reload: yes
+
+  - name: master | remove traefik
+    file:
+      path: /var/lib/rancher/k3s/server/manifests/traefik.yml
+      state: absent
+
+  - name: master | restart k3s
+    systemd:
+      name: k3s
+      state: restarted
+      enabled: yes
+
+  - name: master | get join token
+    command: cat /var/lib/rancher/k3s/server/node-token
+    register: _k3s_token
+
   when: "'k3s_master' in group_names"
 
 - name: join agents
   block:
-  - name: set master node ip address and join token
+  - name: agent | set facts
     set_fact:
       _k3s_master_ip_address: "{{ hostvars[groups['k3s_master'][0]]['ansible_default_ipv4']['address'] }}"
       _k3s_master_join_token: "{{ hostvars[groups['k3s_master'][0]]['_k3s_token']['stdout'] }}"
       _k3s_role: "agent"
+      _k3s_systemd_options: "{{ k3s_agent_systemd_options }}"
 
-  - name: upload k3s service file
+  - name: agent | upload k3s service file
     template:
       src: k3s.service.j2
       dest: /etc/systemd/system/k3s-agent.service
@@ -49,16 +76,16 @@
       group: root
       mode: 0600
 
-  - name: upload k3s service env file
+  - name: agent | upload k3s service env file
     template:
       src: k3s-agent.service.env.j2
       dest: /etc/systemd/system/k3s-agent.service.env
 
-  - name: reload systemd
+  - name: agent | reload systemd
     systemd:
       daemon_reload: yes
 
-  - name: join k3s agent(s) to master
+  - name: agent | join k3s agent(s) to master
     systemd:
       name: k3s-agent
       state: restarted
@@ -66,24 +93,23 @@
 
   when: "'k3s_agents' in group_names"
 
-- name: setup kube config
+- name: local | setup kube config
   block:
   - name: remove old kube dir
     file:
       path: ~/.kube
       state: absent
-    become: false
 
-  - name: ensure kube dir
+  - name: local | ensure kube dir
     file:
       path: ~/.kube
       state: directory
-    become: false
 
   delegate_to: localhost
-  run_once: True
+  run_once: true
+  become: false
 
-- name: download kube config
+- name: local | download kube config
   fetch:
     src: /etc/rancher/k3s/k3s.yaml
     dest: ~/.kube/config
@@ -91,13 +117,13 @@
   when: "'k3s_master' in group_names"
   run_once: True
 
-- name: get k3s master hostname
+- name: local | get k3s master hostname
   set_fact:
     _k3s_master_ip_address: "{{ hostvars[groups['k3s_master'][0]]['ansible_default_ipv4']['address'] }}"
   delegate_to: localhost
   run_once: True
 
-- name: search and replace kube conifg
+- name: local | search and replace kube conifg
   replace:
     dest: ~/.kube/config
     regexp: 'localhost'

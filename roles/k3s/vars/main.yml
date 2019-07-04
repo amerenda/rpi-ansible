@@ -1,3 +1,5 @@
-k3s_version: 0.5.0
+k3s_version: 0.6.1
 debug: False
 end_debug: False
+k3s_master_systemd_options: "--no-deploy traefik"
+k3s_agent_systemd_options: ""

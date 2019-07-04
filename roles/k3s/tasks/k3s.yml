@@ -7,6 +7,8 @@
 
 - name: master | bootstrap master
   shell: "curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION=v{{ k3s_version }} sh -"
+  args:
+    warn: false
   async: 1000
   poll: 0
   register: _k3s_master_bootstrap_bg

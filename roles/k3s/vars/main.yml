@@ -1,5 +1,15 @@
+# Common Options
 k3s_version: 0.6.1
-debug: False
-end_debug: False
+
+# Master options
 k3s_master_systemd_options: "--no-deploy traefik"
+
+# Agent Options
 k3s_agent_systemd_options: ""
+refresh_k3s_agent: True
+k3s_agent_files:
+  - /etc/systemd/system/k3s-agent.service
+  - /etc/systemd/system/k3s-agent.service.env
+  - /etc/systemd/system/k3s.service
+  - /etc/systemd/system/multi-user.target.wants/k3s-agent.service
+  - /var/lib/rancher/k3s

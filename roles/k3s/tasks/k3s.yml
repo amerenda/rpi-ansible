@@ -31,7 +31,7 @@
   block:
   - name: master | set master facts
     set_fact:
-      _k3s_role: 'master'
+      _k3s_role: 'server'
       _k3s_systemd_options: "{{ k3s_master_systemd_options }}"
 
   - name: master | wait for bootstrap master to finish (times out in 5 minutes)

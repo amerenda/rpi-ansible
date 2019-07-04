@@ -16,7 +16,6 @@
   file:
     path: "{{ k3s_agent_files }}"
     state: absent
-    recurse: True
   when: "'k3s_agents' in group_names and refresh_k3s_agent"
 
 - name: agent | download k3s binary

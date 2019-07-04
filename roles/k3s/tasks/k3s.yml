@@ -1,4 +1,10 @@
 ---
+- name: master | uninstall old k3s
+  shell: /usr/local/bin/k3s-uninstall.sh
+  args:
+    removes: /usr/local/bin/k3s
+  when: "'k3s_master' in group_names"
+
 - name: master | bootstrap master
   shell: curl -sfL https://get.k3s.io | sh -
   async: 1000
@@ -35,8 +41,8 @@
 
   - name: master | upload systemd env file
     template:
-      src: "k3s.{{ _k3s_role }}.service.env.j2"
-      dest: /etc/systemd/system/k3s.service
+      src: "k3s-{{ _k3s_role }}.service.env.j2"
+      dest: "/etc/systemd/system/k3s-{{ _k3s_role }}.service.env"
 
   - name: master | reload systemd
     systemd:

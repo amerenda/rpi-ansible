@@ -1,3 +1,2 @@
 - import_tasks: nfs.yml
   when: nfs_host == inventory_hostname
-  tags: ['install:kube', 'kube', 'install:nfs', 'nfs']

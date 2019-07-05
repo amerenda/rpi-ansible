@@ -5,10 +5,21 @@
     removes: /usr/local/bin/k3s
   when: "'k3s_master' in group_names"
 
+- name: master | get install script
+  get_url:
+    url: https://raw.githubusercontent.com/rancher/k3s/master/install.sh
+    dest: /tmp/k3s_installer.sh
+    force: yes
+    mode: 0755
+
 - name: master | bootstrap master
-  shell: "curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION=v{{ k3s_version }} sh -"
+  shell: "/bin/sh /tmp/k3s_installer.sh"
   args:
     warn: false
+  environment:
+    INSTALL_K3S_EXEC: "server --no-deploy traefik servicelb "
+    INSTALL_K3S_VERSION: v{{ k3s_version }}
+
   async: 1000
   poll: 0
   register: _k3s_master_bootstrap_bg

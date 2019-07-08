@@ -2,7 +2,7 @@
 k3s_version: 0.6.1
 
 # Master options
-k3s_master_systemd_options: "--no-deploy traefik"
+k3s_master_systemd_options: "--no-deploy traefik --no-deploy servicelb"
 
 # Agent Options
 k3s_agent_systemd_options: ""

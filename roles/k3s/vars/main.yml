@@ -13,3 +13,7 @@ k3s_agent_files:
   - /etc/systemd/system/k3s.service
   - /etc/systemd/system/multi-user.target.wants/k3s-agent.service
   - /var/lib/rancher/k3s
+
+k3s_data_nodes:
+  - rpi3-2
+  - rpi3-3

@@ -1,4 +1,18 @@
 ---
+- name: debug
+  block:
+  - name: test data node selection
+    file:
+      path: /home/alex/success
+      state: touch
+    when: ansible_hostname in k3s_data_nodes
+
+  - name: end play
+    meta: end_play
+    when: end_after_debug
+
+  when: debug
+
 - name: master | uninstall old k3s
   shell: /usr/local/bin/k3s-uninstall.sh
   args:
@@ -19,7 +33,6 @@
   environment:
     INSTALL_K3S_EXEC: "server --no-deploy traefik --no-deploy servicelb "
     INSTALL_K3S_VERSION: v{{ k3s_version }}
-
   async: 1000
   poll: 0
   register: _k3s_master_bootstrap_bg
@@ -92,6 +105,18 @@
       _k3s_master_join_token: "{{ hostvars[groups['k3s_master'][0]]['_k3s_token']['stdout'] }}"
       _k3s_role: "agent"
       _k3s_systemd_options: "{{ k3s_agent_systemd_options }}"
+
+  - name: agent | create kube mount point (data nodes)
+    file:
+      path: /var/kube/data
+      state: directory
+      owner: root
+      group: root
+    when: ansible_hostname in k3s_data_nodes
+
+  - name: agent | create 200gb kube image data
+    command: fallocate -l 200G /var/kube/data.img
+    when: ansible_hostname in k3s_data_nodes
 
   - name: agent | upload k3s service file
     template:

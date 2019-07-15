@@ -1,3 +1,7 @@
+# Dev Options
+debug: True
+end_after_debug: True
+
 # Common Options
 k3s_version: 0.6.1
 

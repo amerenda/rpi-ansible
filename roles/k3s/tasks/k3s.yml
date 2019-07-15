@@ -97,6 +97,37 @@
 
   when: "'k3s_master' in group_names"
 
+- name: setup data nodes
+  block:
+  - name: data node | ensure xfsprogs
+    apt:
+      name: xfsprogs
+      state: present
+
+  - name: data node | create kube mount point (data nodes)
+    file:
+      path: /var/kube/data
+      state: directory
+      owner: root
+      group: root
+
+  - name: data node | create 200gb kube image data
+    command: fallocate -l 200G /var/kube/data.img
+
+  - name: data node | create xfs on data_nodes
+    filesystem:
+      fstype: xfs
+      dev: /var/kube/data.img
+
+  - name: data node | mount kube image
+    mount:
+      path: /var/kube/data
+      src: /var/kube/data.img
+      fstype: xfs
+      state: mounted
+
+  when: ansible_hostname in k3s_data_nodes
+
 - name: join agents
   block:
   - name: agent | set facts
@@ -105,18 +136,6 @@
       _k3s_master_join_token: "{{ hostvars[groups['k3s_master'][0]]['_k3s_token']['stdout'] }}"
       _k3s_role: "agent"
       _k3s_systemd_options: "{{ k3s_agent_systemd_options }}"
-
-  - name: agent | create kube mount point (data nodes)
-    file:
-      path: /var/kube/data
-      state: directory
-      owner: root
-      group: root
-    when: ansible_hostname in k3s_data_nodes
-
-  - name: agent | create 200gb kube image data
-    command: fallocate -l 200G /var/kube/data.img
-    when: ansible_hostname in k3s_data_nodes
 
   - name: agent | upload k3s service file
     template:

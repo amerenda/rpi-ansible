@@ -1,5 +1,5 @@
 # Dev Options
-debug: True
+debug: False
 end_after_debug: True
 
 # Common Options

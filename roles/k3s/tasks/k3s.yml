@@ -59,7 +59,7 @@
       _k3s_systemd_options: "{{ k3s_master_systemd_options }}"
 
   - name: master | wait for bootstrap master to finish (times out in 5 minutes)
-    async_status: jid={{ _k3s_master_bootstrap_bg.ansible_job_id }}
+    async_status: "{{ _k3s_master_bootstrap_bg.ansible_job_id }}"
     register: _job_result
     until: _job_result.finished
     retries: 300

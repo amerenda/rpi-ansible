@@ -111,8 +111,8 @@
       owner: root
       group: root
 
-  - name: data node | create 200gb kube image data
-    command: fallocate -l 200G /var/kube/data.img
+  - name: data node | create 220gb kube image data
+    command: fallocate -l 220G /var/kube/data.img
 
   - name: data node | create xfs on data_nodes
     filesystem:
@@ -200,3 +200,4 @@
   delegate_to: localhost
   become: false
   run_once: True
+

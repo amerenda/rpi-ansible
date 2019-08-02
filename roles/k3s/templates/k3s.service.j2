@@ -6,8 +6,6 @@ After=network-online.target
 [Service]
 Type=exec
 EnvironmentFile=/etc/systemd/system/k3s-{{ _k3s_role }}.service.env
-ExecStartPre=-/sbin/modprobe br_netfilter
-ExecStartPre=-/sbin/modprobe overlay
 ExecStart=/usr/local/bin/k3s {{ _k3s_role }} {{ _k3s_systemd_options }}
 KillMode=process
 Delegate=yes
@@ -20,3 +18,4 @@ Restart=always
 
 [Install]
 WantedBy=multi-user.target
+

@@ -23,6 +23,4 @@ k3s_data_nodes:
   - rpi3-2
   - rpi3-3
 
-k3s_glusterfs_master_node:
-  - rpi3-1
-
+k3s_glusterfs_master_node: rpi3-0

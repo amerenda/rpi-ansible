@@ -19,7 +19,10 @@ k3s_agent_files:
   - /var/lib/rancher/k3s
 
 k3s_data_nodes:
-  - rpi3-0
   - rpi3-1
   - rpi3-2
   - rpi3-3
+
+k3s_glusterfs_master_node:
+  - rpi3-1
+

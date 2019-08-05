@@ -13,6 +13,44 @@
 
   when: debug
 
-- name: install glusterfs
+- name: glusterfs | add source repository
+  apt_repository:
+    repo: deb-src http://raspbian.raspberrypi.org/raspbian/ stretch main contrib non-free rpi
+    state: present
+
+- name: glusterfs | install glusterfs
   apt:
-    name: gluster
+    name: "{{ packages }}"
+    update_cache: yes
+    state: installed
+  vars:
+    packages:
+    - xfsprogs
+    - attr
+    - glusterfs-server
+    - glusterfs-common
+    - glusterfs-client
+
+- name: glusterfs | enable
+  systemd:
+    name: glusterfs-server
+    enabled: yes
+
+- name: glusterfs | probe peers
+  command: "gluster peer probe {{ item }}"
+  with_items:
+    - "{{ k3s_data_nodes }}"
+  run_once: true
+  delegate_to: "{{ k3s_glusterfs_master_node }}"
+
+- name: glusterfs | create gluster volume
+  gluster_volume:
+    state: present
+    name: kube_data
+    bricks: /var/kube/data
+    arbiters: 1
+    rebalance: yes
+    cluster:
+      - "{{ k3s_data_nodes }}"
+  run_once: true
+  delegate_to: "{{ k3s_glusterfs_master_node }}"

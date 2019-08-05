@@ -184,7 +184,6 @@
     dest: ~/.kube/config
     flat: yes
   when: "'k3s_master' in group_names"
-  run_once: True
 
 - name: local | get k3s master hostname
   set_fact:

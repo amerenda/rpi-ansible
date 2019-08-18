@@ -3,7 +3,7 @@ debug: False
 end_after_debug: True
 
 # Common Options
-k3s_version: 0.6.1
+k3s_version: 0.8.0
 
 # Master options
 k3s_master_systemd_options: "--no-deploy traefik --no-deploy servicelb"
@@ -23,4 +23,3 @@ k3s_data_nodes:
   - rpi3-2
   - rpi3-3
 
-k3s_glusterfs_master_node: rpi3-0

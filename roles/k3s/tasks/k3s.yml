@@ -33,9 +33,6 @@
   environment:
     INSTALL_K3S_EXEC: "server --no-deploy traefik --no-deploy servicelb "
     INSTALL_K3S_VERSION: v{{ k3s_version }}
-  async: 1000
-  poll: 0
-  register: _k3s_master_bootstrap_bg
   when: "'k3s_master' in group_names"
 
 - name: agent | uninstall k3s agents
@@ -57,14 +54,6 @@
     set_fact:
       _k3s_role: 'server'
       _k3s_systemd_options: "{{ k3s_master_systemd_options }}"
-
-  - name: master | wait for bootstrap master to finish (times out in 5 minutes)
-    async_status: "{{ _k3s_master_bootstrap_bg.ansible_job_id }}"
-    register: _job_result
-    until: _job_result.finished
-    retries: 300
-    delay: 1
-    ignore_errors: True
 
   - name: master | upload systemd unit file
     template:
@@ -106,13 +95,13 @@
 
   - name: data node | create kube mount point (data nodes)
     file:
-      path: /var/kube/data
+      path: /var/kube/data/b1
       state: directory
       owner: root
       group: root
 
-  - name: data node | create 220gb kube image data
-    command: fallocate -l 220G /var/kube/data.img
+  - name: data node | create 120gb kube image data
+    command: fallocate -l 120G /var/kube/data.img
 
   - name: data node | create xfs on data_nodes
     filesystem:
@@ -121,7 +110,7 @@
 
   - name: data node | mount kube image
     mount:
-      path: /var/kube/data
+      path: /var/kube/data/b1
       src: /var/kube/data.img
       fstype: xfs
       state: mounted

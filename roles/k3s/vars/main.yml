@@ -18,6 +18,10 @@ k3s_agent_files:
   - /etc/systemd/system/multi-user.target.wants/k3s-agent.service
   - /var/lib/rancher/k3s
 
+# Glusterfs options
+gluster_refresh: False
+gluster_create_volumes: False
+k3s_glusterfs_master_node: rpi3-0
 k3s_data_nodes:
   - rpi3-1
   - rpi3-2

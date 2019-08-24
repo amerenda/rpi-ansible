@@ -95,7 +95,7 @@
 
   - name: data node | create kube mount point (data nodes)
     file:
-      path: /var/kube/data/b1
+      path: /var/kube/data
       state: directory
       owner: root
       group: root
@@ -110,12 +110,12 @@
 
   - name: data node | mount kube image
     mount:
-      path: /var/kube/data/b1
+      path: /var/kube/data
       src: /var/kube/data.img
       fstype: xfs
       state: mounted
 
-  when: ansible_hostname in k3s_data_nodes
+  when: ansible_hostname in k3s_data_nodes and not gluster_refresh
 
 - name: join agents
   block:

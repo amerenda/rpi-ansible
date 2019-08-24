@@ -1,0 +1,105 @@
+---
+- name: debug
+  block:
+  - name: test data node selection
+    file:
+      path: /home/alex/success
+      state: touch
+    when: ansible_hostname in k3s_data_nodes
+
+  - name: end play
+    meta: end_play
+    when: end_after_debug
+
+  when: debug
+
+- name: glusterfs | add source repository
+  apt_repository:
+    repo: deb-src http://raspbian.raspberrypi.org/raspbian/ stretch main contrib non-free rpi
+    state: present
+
+- name: glusterfs | install glusterfs
+  apt:
+    name: "{{ packages }}"
+    update_cache: yes
+    state: installed
+  vars:
+    packages:
+    - xfsprogs
+    - attr
+    - glusterfs-server
+    - glusterfs-common
+    - glusterfs-client
+
+- name: glusterfs | enable
+  systemd:
+    name: glusterfs-server
+    enabled: yes
+
+- name: glusterfs | probe peers
+  command: "gluster peer probe {{ item }}"
+  with_items:
+      - rpi3-1
+      - rpi3-2
+      - rpi3-3
+  delegate_to: "{{ k3s_glusterfs_master_node }}"
+
+- name: glusterfs | load kernel modules
+  modprobe:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - dm_snapshot
+    - dm_mirror
+    - dm_thin_pool
+
+- name: glusterfs | create modprobe file
+  file:
+    path: /etc/modprobe.d/glusterfs.conf
+    state: file
+
+- name: glusterfs | ensure kernel modules on boot
+  lineinfile:
+    path: /etc/modprobe.d/glusterfs.conf
+    line: "{{ item }}"
+  with_items:
+    - dm_snapshot
+    - dm_mirror
+    - dm_thin_pool
+
+- name: create gluster volumes
+  block:
+  - name: glusterfs | remove gluster volume
+    file:
+      path: /var/kube/data/b1
+      state: absent
+    when: gluster_refresh
+
+  - name: glusterfs | create gluster volume
+    gluster_volume:
+      state: present
+      name: kube_data
+      bricks: /var/kube/data/b1
+      replicas: 3
+      arbiters: 1
+      cluster:
+        - rpi3-1
+        - rpi3-2
+        - rpi3-3
+    run_once: true
+    delegate_to: "{{ k3s_glusterfs_master_node }}"
+
+  - name: glusterfs | create mountpoint
+    file:
+      path: /var/kube/gluster
+      state: directory
+
+  - name: mount gluster
+    mount:
+      path: /var/kube/gluster
+      src:  rpi3-0:kube_data
+      fstype: glusterfs
+      opts: defaults,_netdev
+      state: mounted
+
+  when: gluster_create_volumes

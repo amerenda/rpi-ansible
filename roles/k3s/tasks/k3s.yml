@@ -31,7 +31,7 @@
   args:
     warn: false
   environment:
-    INSTALL_K3S_EXEC: "server --no-deploy traefik --no-deploy servicelb "
+    INSTALL_K3S_EXEC: "server --no-deploy traefik --no-deploy servicelb"
     INSTALL_K3S_VERSION: v{{ k3s_version }}
   when: "'k3s_master' in group_names"
 

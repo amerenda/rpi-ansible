@@ -183,7 +183,7 @@
 - name: local | search and replace kube conifg
   replace:
     dest: ~/.kube/config
-    regexp: 'localhost'
+    regexp: '127.0.0.1'
     replace: "{{ _k3s_master_ip_address }}"
   delegate_to: localhost
   become: false

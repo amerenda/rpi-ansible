@@ -3,7 +3,7 @@ debug: False
 end_after_debug: True
 
 # Common Options
-k3s_version: 0.8.0
+k3s_version: 1.0.0
 
 # Master options
 k3s_master_systemd_options: "--no-deploy traefik --no-deploy servicelb"

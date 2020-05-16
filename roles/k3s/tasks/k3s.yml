@@ -43,7 +43,7 @@
 
 - name: agent | download k3s binary
   get_url:
-    url: https://github.com/rancher/k3s/releases/download/v{{ k3s_version }}/k3s-armhf
+    url: https://github.com/rancher/k3s/releases/download/v{{ k3s_version_url }}/k3s-armhf
     dest: /usr/local/bin/k3s
     mode: '0755'
   when: "'k3s_agents' in group_names"
@@ -115,7 +115,7 @@
       fstype: xfs
       state: mounted
 
-  when: ansible_hostname in k3s_data_nodes and not gluster_refresh
+  when: ansible_hostname in k3s_data_nodes and gluster_refresh
 
 - name: join agents
   block:
@@ -188,4 +188,3 @@
   delegate_to: localhost
   become: false
   run_once: True
-

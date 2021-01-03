@@ -8,12 +8,12 @@
   tags: ['swap']
 
 - name: check for cgroups
-  command: "grep 'cgroup_enable=cpuset' /boot/cmdline.txt"
+  command: "grep 'cgroup_enable=cpuset' /boot/firmware/cmdline.txt"
   register: _grep_result
   ignore_errors: True
 
 - name: add cgroups
-  shell: echo $( cat /boot/cmdline.txt ) "cgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory" >  /boot/cmdline.txt
+  shell: echo $( cat /boot/firmware/cmdline.txt ) "cgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory" >  /boot/firmware/cmdline.txt
   when: _grep_result.rc != 0
 
 - name: reboot pis

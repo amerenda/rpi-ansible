@@ -1,4 +1,2 @@
 - import_playbook: playbooks/pre.yml
-- import_playbook: playbooks/cleanup.yml
-- import_playbook: playbooks/common.yml
 - import_playbook: playbooks/kube.yml

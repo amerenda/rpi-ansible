@@ -1,16 +1,15 @@
 ---
 - name: ensure docker is absnet
   apt:
-    name: "{{ item }}"
     state: absent
     purge: True
-  with_items:
-    - docker-ce
-    - docker-ce-cli
+    pkg:
+      - docker-ce
+      - docker-ce-cli
 
 - name: install docker
   shell: curl -sSL get.docker.com | sh
-  environment:
+  entironmeGt:
     VERSION: "{{ docker_version }}"
 
 - name: ensure docker group

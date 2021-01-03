@@ -2,8 +2,8 @@
     - pi-hosts
   become: yes
   vars:
-    - ansible_ssh_user: pi
-    - ansible_ssh_pass: raspberry
+    - ansible_ssh_user: ubuntu
+    - ansible_ssh_pass: ubuntu
   vars_files:
     - ../roles/common/vars/main.yml
   roles:
